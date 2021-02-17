@@ -1,8 +1,11 @@
 <form>
   <div class="form-group form-inline">
-    Zoek op Naam, Sector en Winkelgebied: <input class="form-control ml-2" type="text" [formControl]="filter"/>
+    Zoek op Naam, Sector en Winkelgebied: <input class="form-control ml-2" type="text" [formControl]="filter" (ngModelChange)="refreshHorecaList()"/>
   </div>
 </form>
+
+<ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize" (pageChange)="refreshHorecaList()">
+</ngb-pagination>
 
 <table class="table table-striped">
   <thead>
@@ -32,7 +35,7 @@
     <td><ngb-highlight [result]="horeca.sector.code + ' - ' + horeca.sector.naam" [term]="filter.value"></ngb-highlight></td>
     <td>
       <ngb-highlight [result]="horeca.winkelgebied.naam + ': '" [term]="filter.value"></ngb-highlight><br>
-      <ngb-highlight [result]="horeca.winkelgebied.subcentrum" [term]="filter.value"></ngb-highlight>
+      {{horeca.winkelgebied.subcentrum}}
     </td>
   </tr>
   </tbody>

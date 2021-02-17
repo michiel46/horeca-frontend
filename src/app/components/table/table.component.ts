@@ -1,38 +1,44 @@
-import {Component, PipeTransform} from '@angular/core';
-import {DecimalPipe} from '@angular/common';
-import {map, startWith} from 'rxjs/operators';
+import {Component} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {Horeca, HorecaService} from '../../services/horeca.service';
-
-let HORECA: Horeca[] = [];
-
-function search(text: string): Horeca[] {
-  return HORECA.filter(horeca => {
-    const term = text.toLowerCase();
-    return  horeca.naam.toLowerCase().includes(term)
-      || horeca.sector.code.toLowerCase().includes(term)
-      || horeca.sector.naam.toLowerCase().includes(term)
-      || horeca.winkelgebied.naam.toLowerCase().includes(term);
-  });
-}
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
-  providers: [DecimalPipe, HorecaService]
+  providers: [HorecaService]
 })
 export class TableComponent {
   horeca$: Observable<Horeca[]>;
+  horecaArray: Horeca[];
   filter = new FormControl('');
 
-  constructor(pipe: DecimalPipe, horecaService: HorecaService) {
+  page = 1;
+  pageSize = 30;
+  collectionSize: number;
+
+  constructor(horecaService: HorecaService) {
     horecaService.load().subscribe((data) => {
-      HORECA = data;
-      this.horeca$ = this.filter.valueChanges.pipe(
-        startWith(''),
-        map(text => search(text))
-      );
+      this.horecaArray = data;
+      this.collectionSize = this.horecaArray.length;
+      this.refreshHorecaList();
     });
+  }
+
+  refreshHorecaList(): void {
+    this.horeca$ = of(this.filterHoreca(this.filter.value));
+  }
+
+  private filterHoreca(text: string): Horeca[] {
+    let result =  this.horecaArray.filter(horeca => {
+      const term = text.toLowerCase();
+      return  horeca.naam.toLowerCase().includes(term)
+        || horeca.sector.code.toLowerCase().includes(term)
+        || horeca.sector.naam.toLowerCase().includes(term)
+        || horeca.winkelgebied.naam.toLowerCase().includes(term);
+    });
+    this.collectionSize = result.length;
+    result = result.slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
+    return result;
   }
 }
