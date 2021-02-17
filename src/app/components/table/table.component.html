@@ -1,0 +1,39 @@
+<form>
+  <div class="form-group form-inline">
+    Zoek op Naam, Sector en Winkelgebied: <input class="form-control ml-2" type="text" [formControl]="filter"/>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th scope="col">Creatiedatum</th>
+    <th scope="col">Naam</th>
+    <th scope="col">Adres</th>
+    <th scope="col">Naam v/d keten</th>
+    <th scope="col">Coördinaten</th>
+    <th scope="col">Sector</th>
+    <th scope="col">Winkelgebied</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let horeca of horeca$ | async">
+    <td>{{horeca.creatieDatum}}</td>
+    <td><ngb-highlight [result]="horeca.naam" [term]="filter.value"></ngb-highlight></td>
+    <td>
+      {{ horeca.adres.straat + ' ' + horeca.adres.huisNummer }}<br>
+      {{ horeca.adres.postcode + ' ' + horeca.adres.deelgemeente + ', ' + horeca.adres.deelgemeente }}
+    </td>
+    <td>{{horeca.keten ? horeca.ketenNaam : 'nvt'}}</td>
+    <td>
+      {{horeca.geolocatie.breedtegraad + '° N'}}<br>
+      {{horeca.geolocatie.lengtegraad + '° O'}}
+    </td>
+    <td><ngb-highlight [result]="horeca.sector.code + ' - ' + horeca.sector.naam" [term]="filter.value"></ngb-highlight></td>
+    <td>
+      <ngb-highlight [result]="horeca.winkelgebied.naam + ': '" [term]="filter.value"></ngb-highlight><br>
+      <ngb-highlight [result]="horeca.winkelgebied.subcentrum" [term]="filter.value"></ngb-highlight>
+    </td>
+  </tr>
+  </tbody>
+</table>
